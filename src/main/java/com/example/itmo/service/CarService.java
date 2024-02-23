@@ -2,8 +2,8 @@ package com.example.itmo.service;
 
 import com.example.itmo.model.dto.request.CarInfoRequest;
 import com.example.itmo.model.dto.response.CarInfoResponse;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 
 public interface CarService {
     CarInfoResponse createCar(CarInfoRequest request);
@@ -14,6 +14,7 @@ public interface CarService {
 
     void deleteCar(Long id);
 
-    List<CarInfoResponse> getAllCars();
+    Page<CarInfoResponse> getAllCars(Integer page, Integer perPage, String sort, Sort.Direction order);
 
+    CarInfoResponse linkCarAndDriver(Long userId, Long carId);
 }
