@@ -64,8 +64,7 @@ public class UserServiceImpl implements UserService {
             user.setUpdatedAt(LocalDateTime.now());
 
             user = userRepo.save(user);
-        }
-        else {
+        } else {
             log.error("User not found");
         }
 
@@ -79,8 +78,7 @@ public class UserServiceImpl implements UserService {
             user.setStatus(UserStatus.DELETED);
             user.setUpdatedAt(LocalDateTime.now());
             userRepo.save(user);
-        }
-        else {
+        } else {
             log.error("User not found");
         }
     }
@@ -108,9 +106,17 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<CarInfoResponse> getUserCars(Long id) {
         User user = getUserDb(id);
-        return user.getCars()
-                .stream()
-                .map(car -> mapper.convertValue(car, CarInfoResponse.class))
-                .collect(Collectors.toList());
+        List<CarInfoResponse> carInfoResponses = null;
+
+        if (user.getId() != null) {
+            carInfoResponses = user.getCars()
+                    .stream()
+                    .map(car -> mapper.convertValue(car, CarInfoResponse.class))
+                    .collect(Collectors.toList());
+        } else {
+            log.error("User not found");
+        }
+
+        return carInfoResponses;
     }
 }
