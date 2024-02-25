@@ -31,6 +31,7 @@ public class CarServiceImpl implements CarService {
     private final ObjectMapper mapper;
     private final CarRepo carRepo;
     private final UserService userService;
+    public static final String CAR_NOT_FOUND = "User not found";
 
     @Override
     public CarInfoResponse createCar(CarInfoRequest request) {
@@ -54,29 +55,24 @@ public class CarServiceImpl implements CarService {
     }
 
     private Car getCarDb(Long id) {
-        return carRepo.findById(id).orElse(new Car());
+        return carRepo.findById(id).orElseThrow(() -> new CustomException(CAR_NOT_FOUND, HttpStatus.NOT_FOUND));
     }
 
     @Override
     public CarInfoResponse updateCar(Long id, CarInfoRequest request) {
         Car car = getCarDb(id);
-        if (car.getId() != null) {
-            car.setBrand(request.getBrand() == null ? car.getBrand() : request.getBrand());
-            car.setModel(request.getModel() == null ? car.getModel() : request.getModel());
-            car.setColor(request.getColor() == null ? car.getColor() : request.getColor());
-            car.setYear(request.getYear() == null ? car.getYear() : request.getYear());
-            car.setPrice(request.getPrice() == null ? car.getPrice() : request.getPrice());
-            car.setIsNew(request.getIsNew() == null ? car.getIsNew() : request.getIsNew());
-            car.setType(request.getType() == null ? car.getType() : request.getType());
+        car.setBrand(request.getBrand() == null ? car.getBrand() : request.getBrand());
+        car.setModel(request.getModel() == null ? car.getModel() : request.getModel());
+        car.setColor(request.getColor() == null ? car.getColor() : request.getColor());
+        car.setYear(request.getYear() == null ? car.getYear() : request.getYear());
+        car.setPrice(request.getPrice() == null ? car.getPrice() : request.getPrice());
+        car.setIsNew(request.getIsNew() == null ? car.getIsNew() : request.getIsNew());
+        car.setType(request.getType() == null ? car.getType() : request.getType());
 
-            car.setStatus(CarStatus.UPDATED);
-            car.setUpdatedAt(LocalDateTime.now());
+        car.setStatus(CarStatus.UPDATED);
+        car.setUpdatedAt(LocalDateTime.now());
 
-            car = carRepo.save(car);
-        } else {
-            log.error("Car not found");
-        }
-
+        car = carRepo.save(car);
         return mapper.convertValue(car, CarInfoResponse.class);
     }
 
@@ -84,13 +80,10 @@ public class CarServiceImpl implements CarService {
     public void deleteCar(Long id) {
         Car car = getCarDb(id);
 
-        if (car.getId() != null) {
-            car.setStatus(CarStatus.DELETED);
-            car.setUpdatedAt(LocalDateTime.now());
-            carRepo.save(car);
-        } else {
-            log.error("Car not found");
-        }
+        car.setStatus(CarStatus.DELETED);
+        car.setUpdatedAt(LocalDateTime.now());
+        carRepo.save(car);
+
     }
 
     @Override
