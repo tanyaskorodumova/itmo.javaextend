@@ -1,5 +1,6 @@
 package com.example.itmo.service.impl;
 
+import com.example.itmo.exceptions.CustomException;
 import com.example.itmo.model.db.entity.Car;
 import com.example.itmo.model.db.entity.User;
 import com.example.itmo.model.db.repository.CarRepo;
@@ -13,10 +14,13 @@ import com.example.itmo.utils.PaginationUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.validator.routines.DateValidator;
 import org.springframework.data.domain.*;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.Year;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,6 +34,12 @@ public class CarServiceImpl implements CarService {
 
     @Override
     public CarInfoResponse createCar(CarInfoRequest request) {
+
+        if (!DateValidator.getInstance().isValid(request.getYear().toString(), "y") ||
+                request.getYear() > Year.now().getValue()) {
+            throw new CustomException("Invalid year", HttpStatus.BAD_REQUEST);
+        }
+
         Car car = mapper.convertValue(request, Car.class);
         car.setStatus(CarStatus.CREATED);
         car.setCreatedAt(LocalDateTime.now());
