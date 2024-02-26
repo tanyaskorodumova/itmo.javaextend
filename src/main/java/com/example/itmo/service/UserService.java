@@ -7,8 +7,6 @@ import com.example.itmo.model.dto.response.UserInfoResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 
-import java.util.List;
-
 public interface UserService {
     UserInfoResponse getUser(Long id);
 
@@ -24,5 +22,5 @@ public interface UserService {
 
     User updateCarList(User user);
 
-    List<CarInfoResponse> getUserCars(Long id);
+    Page<CarInfoResponse> getUserCars(Long id, Integer page, Integer perPage, String sort, Sort.Direction order);
 }

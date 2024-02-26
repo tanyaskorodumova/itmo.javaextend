@@ -7,6 +7,7 @@ import com.example.itmo.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -56,8 +57,12 @@ public class UserController {
 
     @GetMapping("/{id}/cars")
     @Operation(summary = "Получение автомобилей пользователя")
-    public List<CarInfoResponse> getUserCars(@PathVariable Long id) {
-        return userService.getUserCars(id);
+    public Page<CarInfoResponse> getUserCars(@PathVariable Long id,
+                                                 @RequestParam(defaultValue = "1") Integer page,
+                                                 @RequestParam(defaultValue = "10") Integer perPage,
+                                                 @RequestParam(defaultValue = "brand") String sort,
+                                                 @RequestParam(defaultValue = "ASC") Sort.Direction order) {
+        return userService.getUserCars(id, page, perPage, sort, order);
     }
 
 }

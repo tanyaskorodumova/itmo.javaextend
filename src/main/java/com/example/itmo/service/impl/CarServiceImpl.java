@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.time.Year;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,9 +37,11 @@ public class CarServiceImpl implements CarService {
     @Override
     public CarInfoResponse createCar(CarInfoRequest request) {
 
-        if (!DateValidator.getInstance().isValid(request.getYear().toString(), "y") ||
-                request.getYear() > Year.now().getValue()) {
-            throw new CustomException("Invalid year", HttpStatus.BAD_REQUEST);
+        if (!Optional.ofNullable(request.getYear()).isEmpty()) {
+            if (!DateValidator.getInstance().isValid(request.getYear().toString(), "y") ||
+                    request.getYear() > Year.now().getValue()) {
+                throw new CustomException("Invalid year", HttpStatus.BAD_REQUEST);
+            }
         }
 
         Car car = mapper.convertValue(request, Car.class);
@@ -51,7 +54,10 @@ public class CarServiceImpl implements CarService {
 
     @Override
     public CarInfoResponse getCar(Long id) {
-        return mapper.convertValue(getCarDb(id), CarInfoResponse.class);
+        Car car = getCarDb(id);
+        CarInfoResponse carInfoResponse = mapper.convertValue(car, CarInfoResponse.class);
+        carInfoResponse.setUser(mapper.convertValue(car.getUser(), UserInfoResponse.class));
+        return carInfoResponse;
     }
 
     private Car getCarDb(Long id) {
@@ -83,7 +89,6 @@ public class CarServiceImpl implements CarService {
         car.setStatus(CarStatus.DELETED);
         car.setUpdatedAt(LocalDateTime.now());
         carRepo.save(car);
-
     }
 
     @Override
@@ -93,7 +98,11 @@ public class CarServiceImpl implements CarService {
         List<CarInfoResponse> all = carRepo.findAll(request)
                 .getContent()
                 .stream()
-                .map(car -> mapper.convertValue(car, CarInfoResponse.class))
+                .map(car -> {
+                    CarInfoResponse carInfoResponse = mapper.convertValue(car, CarInfoResponse.class);
+                    carInfoResponse.setUser(mapper.convertValue(car.getUser(), UserInfoResponse.class));
+                    return carInfoResponse;
+                })
                 .collect(Collectors.toList());
 
         Page<CarInfoResponse> pageResponse = new PageImpl<>(all);

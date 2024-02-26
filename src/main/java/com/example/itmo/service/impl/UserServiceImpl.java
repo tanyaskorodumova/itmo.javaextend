@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -113,11 +114,23 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<CarInfoResponse> getUserCars(Long id) {
+    public Page<CarInfoResponse> getUserCars(Long id, Integer page, Integer perPage, String sort, Sort.Direction order) {
+        Pageable request = PaginationUtil.getPageRequest(page, perPage, sort, order);
+
         User user = getUserDb(id);
-        return user.getCars()
+        List<CarInfoResponse> allCars = user.getCars()
                 .stream()
-                .map(car -> mapper.convertValue(car, CarInfoResponse.class))
+                .map(car -> {
+                    CarInfoResponse carInfoResponse = mapper.convertValue(car, CarInfoResponse.class);
+                    carInfoResponse.setUser(mapper.convertValue(user, UserInfoResponse.class));
+                    return carInfoResponse;
+                })
                 .collect(Collectors.toList());
+        int size = allCars.size();
+        List<CarInfoResponse> userCars = allCars.stream().limit(perPage).collect(Collectors.toList());
+
+        Page<CarInfoResponse> pageResponse = new PageImpl<>(userCars, request, size);
+
+        return pageResponse;
     }
 }
