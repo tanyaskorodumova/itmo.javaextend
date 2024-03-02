@@ -128,5 +128,22 @@ public class CarServiceImpl implements CarService {
         return carInfoResponse;
     }
 
+    @Override
+    public Page<CarInfoResponse> getUserCars(Long userId, Integer page, Integer perPage, String sort, Sort.Direction order) {
+        Pageable request = PaginationUtil.getPageRequest(page, perPage, sort, order);
 
+        List<CarInfoResponse> all = carRepo.findAllByUserId(userId, request)
+                .getContent()
+                .stream()
+                .map(car -> {
+                    CarInfoResponse carInfoResponse = mapper.convertValue(car, CarInfoResponse.class);
+                    carInfoResponse.setUser(mapper.convertValue(car.getUser(), UserInfoResponse.class));
+                    return carInfoResponse;
+                })
+                .collect(Collectors.toList());
+
+        Page<CarInfoResponse> pageResponse = new PageImpl<>(all);
+
+        return pageResponse;
+    }
 }

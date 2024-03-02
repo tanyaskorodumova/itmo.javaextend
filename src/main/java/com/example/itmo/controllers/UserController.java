@@ -55,14 +55,4 @@ public class UserController {
         return userService.getAllUsers(page, perPage, sort, order);
     }
 
-    @GetMapping("/{id}/cars")
-    @Operation(summary = "Получение автомобилей пользователя")
-    public Page<CarInfoResponse> getUserCars(@PathVariable Long id,
-                                                 @RequestParam(defaultValue = "1") Integer page,
-                                                 @RequestParam(defaultValue = "10") Integer perPage,
-                                                 @RequestParam(defaultValue = "brand") String sort,
-                                                 @RequestParam(defaultValue = "ASC") Sort.Direction order) {
-        return userService.getUserCars(id, page, perPage, sort, order);
-    }
-
 }

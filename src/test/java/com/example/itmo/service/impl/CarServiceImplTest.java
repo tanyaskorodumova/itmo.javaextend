@@ -41,12 +41,6 @@ public class CarServiceImplTest {
         assertEquals(Long.valueOf(1L), result.getId());
     }
 
-//    @Test(expected = MethodArgumentNotValidException.class)
-//    public void createCarWithoutBrand() {
-//        CarInfoRequest request = new CarInfoRequest();
-//        carService.createCar(request);
-//    }
-
     @Test(expected = CustomException.class)
     public void createCarInvalidYear() {
         CarInfoRequest request = new CarInfoRequest();

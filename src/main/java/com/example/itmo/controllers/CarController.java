@@ -57,4 +57,14 @@ public class CarController {
     public CarInfoResponse linkCarAndDriver(@PathVariable Long userId, @PathVariable Long carId) {
         return carService.linkCarAndDriver(userId, carId);
     }
+
+    @GetMapping("/userCars/{userId}")
+    @Operation(summary = "Получение всех автомобилей пользователя")
+    public Page<CarInfoResponse> getUserCars(@PathVariable Long userId,
+                                             @RequestParam(defaultValue = "1") Integer page,
+                                             @RequestParam(defaultValue = "10") Integer perPage,
+                                             @RequestParam(defaultValue = "brand") String sort,
+                                             @RequestParam(defaultValue = "ASC") Sort.Direction order) {
+        return carService.getUserCars(userId, page, perPage, sort, order);
+    }
 }

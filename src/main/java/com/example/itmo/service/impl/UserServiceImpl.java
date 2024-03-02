@@ -113,24 +113,4 @@ public class UserServiceImpl implements UserService {
         return userRepo.save(user);
     }
 
-    @Override
-    public Page<CarInfoResponse> getUserCars(Long id, Integer page, Integer perPage, String sort, Sort.Direction order) {
-        Pageable request = PaginationUtil.getPageRequest(page, perPage, sort, order);
-
-        User user = getUserDb(id);
-        List<CarInfoResponse> allCars = user.getCars()
-                .stream()
-                .map(car -> {
-                    CarInfoResponse carInfoResponse = mapper.convertValue(car, CarInfoResponse.class);
-                    carInfoResponse.setUser(mapper.convertValue(user, UserInfoResponse.class));
-                    return carInfoResponse;
-                })
-                .collect(Collectors.toList());
-        int size = allCars.size();
-        List<CarInfoResponse> userCars = allCars.stream().limit(perPage).collect(Collectors.toList());
-
-        Page<CarInfoResponse> pageResponse = new PageImpl<>(userCars, request, size);
-
-        return pageResponse;
-    }
 }
