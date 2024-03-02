@@ -37,7 +37,7 @@ public class CarServiceImpl implements CarService {
     @Override
     public CarInfoResponse createCar(CarInfoRequest request) {
 
-        if (!Optional.ofNullable(request.getYear()).isEmpty()) {
+        if (Optional.ofNullable(request.getYear()).isPresent()) {
             if (!DateValidator.getInstance().isValid(request.getYear().toString(), "y") ||
                     request.getYear() > Year.now().getValue()) {
                 throw new CustomException("Invalid year", HttpStatus.BAD_REQUEST);
@@ -127,4 +127,6 @@ public class CarServiceImpl implements CarService {
 
         return carInfoResponse;
     }
+
+
 }

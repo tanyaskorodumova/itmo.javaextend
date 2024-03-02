@@ -22,6 +22,7 @@ import org.springframework.data.domain.Sort;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -110,21 +111,19 @@ public class UserServiceImplTest {
     @Test
     public void getAllUsers() {
         List<User> users = new ArrayList<>();
-        User user = new User();
-        user.setId(1L);
-        users.add(user);
-        user = new User();
-        user.setId(2L);
-        users.add(user);
-        user = new User();
-        user.setId(3L);
-        users.add(user);
-
+        List<UserInfoResponse> userInfoResponses = new ArrayList<>();
+        for (long i = 0; i < 10; i++) {
+            User user = new User();
+            user.setId(i);
+            users.add(user);
+        }
+        userInfoResponses = users.stream().map(u -> mapper.convertValue(u, UserInfoResponse.class)).collect(Collectors.toList());
         when(userRepo.findAll(any(Pageable.class))).thenReturn(new PageImpl<>(users));
 
-        Page<UserInfoResponse> result = userService.getAllUsers(1, 1, "id", Sort.Direction.ASC);
+        Page<UserInfoResponse> result = userService.getAllUsers(1, 10, "id", Sort.Direction.ASC);
         assertEquals(result.getTotalElements(), users.size());
-        //assertEquals(result, new PageImpl<>(users));
+
+        assertEquals(result.getContent(), userInfoResponses);
     }
 
     @Test

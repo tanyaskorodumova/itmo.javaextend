@@ -15,4 +15,18 @@ import lombok.experimental.SuperBuilder;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class UserInfoResponse extends UserInfoRequest {
     Long id;
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) return false;
+
+        if (obj.getClass() != this.getClass()) return false;
+
+        if (this.getId().equals(((UserInfoResponse) obj).getId())) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
 }
