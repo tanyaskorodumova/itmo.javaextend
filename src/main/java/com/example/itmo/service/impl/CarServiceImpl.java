@@ -32,7 +32,7 @@ public class CarServiceImpl implements CarService {
     private final ObjectMapper mapper;
     private final CarRepo carRepo;
     private final UserService userService;
-    public static final String CAR_NOT_FOUND = "User not found";
+    public static final String CAR_NOT_FOUND = "Car not found";
 
     @Override
     public CarInfoResponse createCar(CarInfoRequest request) {
@@ -60,7 +60,7 @@ public class CarServiceImpl implements CarService {
         return carInfoResponse;
     }
 
-    private Car getCarDb(Long id) {
+    public Car getCarDb(Long id) {
         return carRepo.findById(id).orElseThrow(() -> new CustomException(CAR_NOT_FOUND, HttpStatus.NOT_FOUND));
     }
 
@@ -130,6 +130,8 @@ public class CarServiceImpl implements CarService {
 
     @Override
     public Page<CarInfoResponse> getUserCars(Long userId, Integer page, Integer perPage, String sort, Sort.Direction order) {
+        userService.getUser(userId); //Нужно исключение, если user не найден
+
         Pageable request = PaginationUtil.getPageRequest(page, perPage, sort, order);
 
         List<CarInfoResponse> all = carRepo.findAllByUserId(userId, request)
