@@ -61,8 +61,9 @@ public class GlobalException {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorMessage> handleMissingParams(MethodArgumentNotValidException ex) {
+        String message = ex.getFieldError() == null ? ex.getFieldError().getDefaultMessage() : ex.getMessage();
         return ResponseEntity.status(400)
-                .body(new ErrorMessage(ex.getFieldError().getDefaultMessage()));
+                .body(new ErrorMessage(message));
     }
 
 }
